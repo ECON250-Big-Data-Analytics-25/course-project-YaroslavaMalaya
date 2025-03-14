@@ -6,5 +6,16 @@ sources:
     schema: ymala  
     tables:
       - name: week3_arxiv
-      
       - name: sheet_external
+
+  - name: test_dataset
+    database: econ250-2025
+    schema: test_dataset  
+    tables:
+      - name: week3_arxiv
+
+  - name: google_trends
+    database: bigquery-public-data
+    schema: google_trends  
+    tables:
+      - name: international_top_terms
