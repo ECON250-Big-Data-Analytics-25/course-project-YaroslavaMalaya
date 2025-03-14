@@ -6,4 +6,4 @@ select
 
     split(regexp_replace(authors, r"\'|\[|\]", ""), ', ') as split_authors,
 *
-from {{ source('ymala', 'week3_arxiv')}} limit 1000
+from {{ source('ymala', 'week3_arxiv')}}
