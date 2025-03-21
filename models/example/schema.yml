@@ -9,7 +9,12 @@ models:
         description: "The primary key for this table"
         data_tests:
           - unique
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">10"
+                warn_if: ">0"
+
 
   - name: my_second_dbt_model
     description: "A starter dbt model"
