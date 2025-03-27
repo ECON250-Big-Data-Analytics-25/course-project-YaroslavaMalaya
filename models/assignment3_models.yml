@@ -1,0 +1,17 @@
+
+version: 2
+
+models:
+  - name: stg_assignment3_uk_wiki
+    description: "Staging model with desktop and mobile data from assignment3_input_uk(_m)"
+    columns:
+      - name: src
+        description: "Source of data"
+        data_tests:
+          - not_null
+          - accepted_values: 
+              values: ['desktop', 'mobile']
+  - name: int_assignment3_uk_wiki
+  - name: fct_assignment3_top200
+  - name: fct_assignment3_article_analize
+  
