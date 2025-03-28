@@ -1,0 +1,25 @@
+
+version: 2
+
+models:
+  - name: stg_week5_transactions_deduplicated_view
+    description: "Clean transaction data"
+    columns:
+      - name: visitId
+        description: '{{ doc("visitid_description")}}'
+      - name: transaction.transactionId
+        description: Transaction ID deduplicated (unique for the model)
+        data_tests:
+        - not_null
+      - name: transaction.transactionRevenue
+        data_tests:
+        - not_null
+      - name: _surrogate_key
+        description: "The Transaction ID"
+        data_tests:
+        - not_null
+        - unique:
+            config:
+                severity: error
+                error_if: ">100"
+                warn_if: ">0"
