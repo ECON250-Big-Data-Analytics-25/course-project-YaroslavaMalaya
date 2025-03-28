@@ -5,7 +5,10 @@ models:
   - name: stg_week5_transactions_deduplicated_view
     description: "Clean transaction data"
     columns:
+      - name: visitId
+        description: '{{ doc("visitid_description")}}'
       - name: transaction.transactionId
+        description: Transaction ID deduplicated (unique for the model)
         data_tests:
         - not_null
       - name: transaction.transactionRevenue
