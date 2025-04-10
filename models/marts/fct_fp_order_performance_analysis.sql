@@ -16,7 +16,7 @@ cte_order_performance as (
     select 
         order_month,
         product_category_name,
-        count(order_id) as total_orders,
+        count(distinct order_id) as total_orders,
         round(sum(price + freight_value), 2) as total_revenue
     from cte_unnest_items
     group by order_month, product_category_name

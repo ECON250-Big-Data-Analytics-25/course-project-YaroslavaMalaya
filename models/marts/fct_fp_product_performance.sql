@@ -19,9 +19,9 @@ cte_top_products_month as (
     product_id, 
     product_category_name,
     seller_id,
-    count(order_id) as total_orders,
+    count(distinct  order_id) as total_orders,
     round(sum(price), 2) as total_revenue,
-    row_number() over (partition by order_month order by count(order_id) desc) as top_number
+    row_number() over (partition by order_month order by count(distinct order_id) desc) as top_number
   from cte_unnest_items
   group by order_month, product_id, product_category_name, seller_id
   order by order_month
