@@ -1,0 +1,283 @@
+
+version: 2
+
+models:
+  - name: stg_fp_customers
+    description: Staging model with customer data from fp_customers
+    columns:
+      - name: customer_id
+        description: Unique customer id. Each order has a unique customer_id
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_city
+        description: Customer city name where nulls replaced with 'missing'
+        data_tests:
+          - not_null
+      - name: customer_state
+        description: Customer state where nulls replaced with 'missing'
+        data_tests:
+          - not_null
+  - name: stg_fp_order_items
+    description: Staging model with order items data from stg_fp_order_items
+    columns:
+      - name: order_id
+        description: Order unique identifier
+        data_tests:
+          - not_null
+      - name: order_item_position
+        description: Position of item in order
+      - name: shipping_limit_datetime
+        description: The seller shipping limit date as datetime
+      - name: price
+        description: Item price where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: price > 0
+  - name: stg_fp_order_payments
+    description: Staging model with payments data from fp_order_payments
+    columns:
+      - name: order_id
+        description: Unique identifier of an order
+        data_tests:
+          - not_null
+      - name: payment_type
+        description: Method of payment where nulls replaced with 'missing'
+        data_tests:
+          - not_null
+      - name: payment_value
+        description: Transaction value where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: payment_value > 0
+  - name: stg_fp_orders
+    description: Staging model with orders data from fp_orders
+    columns:
+      - name: order_id
+        description: Unique identifier of the order
+        data_tests:
+          - not_null
+          - unique
+      - name: order_status
+        description: Order status where nulls replaced with 'missing'
+        data_tests:
+          - not_null
+      - name: is_delivered
+        description: Boolean value to check if order was delivered
+        data_tests:
+          - not_null
+      - name: order_purchase_at
+        description: Shows the purchase datetime
+      - name: order_approved_at
+        description: Shows the payment approval datetime where nulls replaced as order_purchase_at
+        data_tests:
+          - not_null
+      - name: order_delivered_carrier_date
+        description: Shows the order posting datetime where nulls replaced as order_purchase_at
+        data_tests:
+          - not_null
+      - name: order_delivered_customer_date
+        description: Shows the actual order delivery datetime where nulls replaced as order_estimated_delivery_date
+        data_tests:
+          - not_null
+      - name: order_estimated_delivery_date
+        description: Shows the estimated delivery datetime
+      - name: approve_time_days
+        description: Days between order purchase and approval dates
+      - name: delivery_time_days
+        description: Days between order purchase and delivery dates
+  - name: stg_fp_products
+    description: Staging model with products data from fp_products
+    columns:
+      - name: product_id
+        description: Unique product identifier
+        data_tests:
+          - not_null
+          - unique
+      - name: product_category_name
+        description: Root category of product where nulls replaced with 'missing'
+      - name: product_name_length
+        description: Length of the product name where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_name_length > 0
+      - name: product_description_length
+        description: Length of the product description where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_description_length > 0
+      - name: product_photos_quantity
+        description: Number of product published photos where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_photos_quantity > 0
+      - name: product_weight_g
+        description: Product weight where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_weight_g > 0
+      - name: product_length_cm
+        description: Product length where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_length_cm > 0
+      - name: product_height_cm
+        description: Product height where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_height_cm > 0
+      - name: product_width_cm
+        description: Product width where nulls replaced with 0
+        data_tests:
+          - not_null:
+              config:
+                where: product_width_cm > 0
+  - name: stg_fp_sellers
+    description: Staging model with sellers data from fp_sellers
+    columns:
+    - name: seller_id
+      description: Seller unique identifier
+      data_tests:
+        - not_null
+        - unique
+    - name: seller_city
+      description: Seller city name where nulls replaced with 'missing'
+    - name: seller_state
+      description: Seller city name where nulls replaced with 'missing'
+  - name: stg_fp_product_category_name_translation
+    description: Staging model with translation from fp_product_category_name_translation
+    columns:
+      - name: product_category_name_portuguese
+        description: Category name in Portuguese
+  - name: int_fp_sales_full
+    description: Combined the information from all separate source tables into a single model that represents sales. Each row represents data related to a single order_id. Payments and products are aggregated into arrays of structs
+    columns:
+      - name: order_id
+        description: Order unique identifier
+      - name: customer_id
+        description: Unique customer id. Each order has a unique customer_id
+      - name: customer_unique_id
+        description: Unique identifier of a customer
+      - name: customer_city
+        description: Customer city name
+      - name: customer_state
+        description: Customer state
+      - name: order_status
+        description: Reference to the order status (delivered, shipped, etc)
+      - name: is_delivered
+        description: Boolean value to check if order was delivered
+      - name: order_purchase_at
+        description: Shows the purchase datetime
+      - name: order_approved_at
+        description: Shows the payment approval datetime
+      - name: order_delivered_carrier_date
+        description: Shows the order posting datetime. When it was handled to the logistic partner
+      - name: order_delivered_customer_date
+        description: Shows the actual order delivery date to the customer
+      - name: order_estimated_delivery_date
+        description: Shows the estimated delivery date that was informed to customer at the purchase moment
+      - name: approve_time_days
+        description: Days between order purchase and approval dates
+      - name: delivery_time_days
+        description: Days between order purchase and delivery dates
+      - name: payments
+        description: Array of structs that contains all payments for the order
+      - name: items
+        description: Array of structs that contains all items in the order, including product and seller information
+  - name: fct_fp_customer_behaviour_analysis
+    description: Shows if a customer is new, thier purchase frequency as total orders and the last data of purchase, and customer lifetime value (total amount of revenue received from each customer)
+    columns:
+      - name: customer_unique_id
+        description: Unique identifier of a customer
+        data_tests:
+          - not_null
+          - unique
+      - name: total_revenue
+        description: Total revenue from the customer
+        data_tests:
+          - not_null:
+              config:
+                where: total_revenue > 0
+      - name: new_customer
+        description: Bollean value represents if a customer new (if true) or returning (if fasle)
+        data_tests:
+          - not_null
+      - name: purchase_frequency
+        description: Shows how many purchases were done of all time
+        data_tests:
+          - not_null:
+              config:
+                where: purchase_frequency > 0
+      - name: last_purchase_at
+        description: Shows a data of last purchase
+        data_tests:
+          - not_null
+  - name: fct_fp_order_performance_analysis
+    description: Monthly order metrics including number of total orders, revenue that grouped by product_category_name
+    columns:
+      - name: order_month
+        description: The month of the order
+        data_tests:
+          - not_null
+      - name: product_category_name
+        description: Root category of product
+        data_tests:
+          - not_null
+      - name: total_orders
+        description: Shows how many orders were done (in this month of this category)
+        data_tests:
+          - not_null:
+              config:
+                where: total_orders > 0
+      - name: total_revenue
+        description: Total revenue that brought this product in this month
+        data_tests:
+          - not_null:
+              config:
+                where: total_revenue > 0
+  - name: fct_fp_product_performance
+    description: Represents top 10 products for each month based on count of orders of this product. Also shows total revenue of them and seller
+    columns:
+      - name: order_month
+        description: The month of the order
+        data_tests:
+          - not_null
+      - name: product_id
+        description: Unique product identifier
+        data_tests:
+          - not_null
+      - name: product_category_name
+        description: Root category of product
+        data_tests:
+          - not_null
+      - name: seller_id
+        description: Seller unique identifier
+        data_tests:
+          - not_null
+      - name: total_orders
+        description: Shows how many orders were done of this product
+        data_tests:
+          - not_null:
+              config:
+                where: total_orders > 0
+      - name: total_revenue
+        description: Total revenue that brought this product
+        data_tests:
+          - not_null:
+              config:
+                where: total_revenue > 0
+      - name: top_number
+        description: Position in top 10 products of the month
+        data_tests:
+          - not_null:
+              config:
+                where: top_number >= 1 and top_number <= 10
+      

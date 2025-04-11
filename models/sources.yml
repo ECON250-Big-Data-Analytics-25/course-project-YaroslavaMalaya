@@ -1,0 +1,54 @@
+version: 2
+
+sources:
+  - name: ymala
+    database: econ250-2025
+    schema: ymala  
+    tables:
+      - name: week3_arxiv
+      - name: sheet_external
+
+  - name: test_dataset
+    database: econ250-2025
+    schema: test_dataset  
+    tables:
+      - name: assignment5_input
+      - name: air_raid_alerts_ua
+        loaded_at_field: started_at
+        freshness:
+          error_after:
+            count: 2
+            period: day
+      - name: week3_arxiv
+      - name: week5_web_transactions
+        description: |
+          Transaction-level  data. Can be combined with week5_visits using 'visitId' field
+
+          May contain duplicates, for **deduplicated** data look for other model
+        columns:
+          - name: date
+            description: date of the transaction
+          - name: visitId
+            description: '{{ doc("visitid_description")}}'
+          - name: transaction.transactionId
+            data_tests:
+            - not_null:
+                config:
+                    severity: error
+                    error_if: ">10"
+                    warn_if: ">0"
+      - name: week5_web_visits
+      - name: week5_hits
+
+  - name: google_trends
+    database: bigquery-public-data
+    schema: google_trends  
+    tables:
+      - name: international_top_terms
+        loaded_at_field: TIMESTAMP(refresh_date)
+        freshness:
+          filter: "refresh_date >= current_date() -7"
+          error_after:
+            count: 2
+            period: day
+        
